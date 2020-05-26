@@ -59,8 +59,42 @@ def _preprocess_data(data):
     # ---------------------------------------------------------------
 
     # ----------- Replace this code with your own preprocessing steps --------
-    predict_vector = feature_vector_df[['Pickup Lat','Pickup Long',
-                                        'Destination Lat','Destination Long']]
+    # encode 'Personal or Business' columns
+    train_encoded = pd.get_dummies(train_df, columns=['Personal or Business'], drop_first=True)
+    test_encoded = pd.get_dummies(test_df, columns=['Personal or Business'], drop_first=True)
+    
+    # preserve encoded variables
+    train_bp = train_encoded['Personal or Business_Personal']
+    test_bp = test_encoded['Personal or Business_Personal']
+    
+    # Initialise variables to be scaled 
+    train_scale = train_encoded.drop(['Time from Pickup to Arrival'], axis='columns')
+    test_scale = test_encoded.copy()
+    
+    # import sklearn preprocessing transformers
+    from sklearn.preprocessing import StandardScaler
+    # create scaler & encoder objects
+    scaler = StandardScaler()
+    
+    # scale and encode required columns
+    train_scaled = scaler.fit_transform(train_scale) 
+    test_scaled = scaler.fit_transform(test_scale)
+    
+    # combine scaled and encoded variables for test & train
+    train_final = pd.DataFrame(train_scaled,columns=train_scale.columns)
+    test_final = pd.DataFrame(test_scaled,columns=train_scale.columns)
+    
+    # combine scaled and encoded variables for test & train
+    train_final = pd.DataFrame(train_scaled,columns=train_scale.columns)
+    test_final = pd.DataFrame(test_scaled,columns=train_scale.columns)
+    
+    train_final['Personal or Business_Personal'] = train_bp
+    test_final['Personal or Business_Personal'] = test_bp
+    
+    predict_vector = feature_vector_df[[train_bp,test_bp]]
+    
+    #predict_vector = feature_vector_df[['Pickup Lat','Pickup Long',
+                                        #'Destination Lat','Destination Long']]
     # ------------------------------------------------------------------------
 
     return predict_vector
