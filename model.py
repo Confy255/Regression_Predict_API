@@ -59,45 +59,64 @@ def _preprocess_data(data):
     # ---------------------------------------------------------------
 
     # ----------- Replace this code with your own preprocessing steps --------
-    # encode 'Personal or Business' columns
-    train_encoded = pd.get_dummies(train_df, columns=['Personal or Business'], drop_first=True)
-    test_encoded = pd.get_dummies(test_df, columns=['Personal or Business'], drop_first=True)
-    
-    # preserve encoded variables
-    train_bp = train_encoded['Personal or Business_Personal']
-    test_bp = test_encoded['Personal or Business_Personal']
-    
-    # Initialise variables to be scaled 
-    train_scale = train_encoded.drop(['Time from Pickup to Arrival'], axis='columns')
-    test_scale = test_encoded.copy()
-    
-    # import sklearn preprocessing transformers
-    from sklearn.preprocessing import StandardScaler
-    # create scaler & encoder objects
-    scaler = StandardScaler()
-    
-    # scale and encode required columns
-    train_scaled = scaler.fit_transform(train_scale) 
-    test_scaled = scaler.fit_transform(test_scale)
-    
-    # combine scaled and encoded variables for test & train
-    train_final = pd.DataFrame(train_scaled,columns=train_scale.columns)
-    test_final = pd.DataFrame(test_scaled,columns=train_scale.columns)
-    
-    # combine scaled and encoded variables for test & train
-    train_final = pd.DataFrame(train_scaled,columns=train_scale.columns)
-    test_final = pd.DataFrame(test_scaled,columns=train_scale.columns)
-    
-    train_final['Personal or Business_Personal'] = train_bp
-    test_final['Personal or Business_Personal'] = test_bp
-    
-    predict_vector = feature_vector_df[[train_bp,test_bp]]
-    
-    #predict_vector = feature_vector_df[['Pickup Lat','Pickup Long',
-                                        #'Destination Lat','Destination Long']]
+
+    # List columns that should be dropped
+    to_drop = ['Order No',
+               'User Id',
+               'Rider Id',
+               'Vehicle Type',
+               'Confirmation - Day of Month',
+               'Confirmation - Weekday (Mo = 1)',
+               'Confirmation - Time',
+               'Arrival at Pickup - Day of Month',
+               'Arrival at Pickup - Weekday (Mo = 1)',
+               'Arrival at Pickup - Time',
+               'Pickup - Day of Month',
+               'Pickup - Weekday (Mo = 1)']
+
+    # drop columns
+    feature_vector_df.drop(to_drop, axis = 1, inplace = True)
+
+    # add features
+    # add waiting time
+    feature_vector_df['Pickup - Time'] = pd.to_datetime(feature_vector_df['Pickup - Time'])
+    feature_vector_df['Placement - Time'] = pd.to_datetime(feature_vector_df['Placement - Time'])
+    feature_vector_df['Waiting time'] = feature_vector_df['Pickup - Time'] - feature_vector_df['Placement - Time']
+    feature_vector_df['Waiting time'] = feature_vector_df['Waiting time'].astype('timedelta64[s]')
+
+    # convert day of month to cyclic feature
+    feature_vector_df['month_sin'] = np.sin((feature_vector_df['Placement - Day of Month']-1)*(2.*np.pi/30.5))
+    feature_vector_df['month_cos'] = np.cos((feature_vector_df['Placement - Day of Month']-1)*(2.*np.pi/30.5))
+
+    # Converting the weekday to a cyclic feature
+    feature_vector_df['day_sin'] = np.sin((feature_vector_df['Placement - Weekday (Mo = 1)']-1)*(2.*np.pi/7))
+    feature_vector_df['day_cos'] = np.cos((feature_vector_df['Placement - Weekday (Mo = 1)']-1)*(2.*np.pi/7))
+
+    # Converting the pickup time to date_time format and extracting the hour
+    feature_vector_df['Pickup - Time'] = pd.to_datetime(feature_vector_df['Pickup - Time']).dt.hour
+    # convert pickup time to cyclic feature
+    feature_vector_df['hr_sin'] = np.sin(feature_vector_df['Pickup - Time']*(2.*np.pi/24))
+    feature_vector_df['hr_cos'] = np.cos(feature_vector_df['Pickup - Time']*(2.*np.pi/24))
+
+    # drop unecessary columns
+    drop = ['Placement - Time', 'Pickup - Time','Placement - Weekday (Mo = 1)', 'Placement - Day of Month']
+    feature_vector_df.drop(drop, axis = 1, inplace = True)
+
+    # Impute missing values
+    feature_vector_df['Precipitation in millimeters'].fillna(0,inplace=True)
+    feature_vector_df['Temperature'].fillna(23.25,inplace=True)
+
+    # Convert the 'platform type' data type to category
+    feature_vector_df['Platform Type'] = feature_vector_df['Platform Type'].astype('category')
+
+    # Encode categorical data
+    feature_vector_df = pd.get_dummies(feature_vector_df, drop_first=True)
+
+    predict_vector = feature_vector_df
     # ------------------------------------------------------------------------
 
     return predict_vector
+
 
 def load_model(path_to_model:str):
     """Adapter function to load our pretrained model into memory.
