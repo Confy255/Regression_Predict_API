@@ -12,7 +12,7 @@
 # Dependencies
 import pandas as pd
 import pickle
-from sklearn.linear_model import Lasso
+from sklearn.ensemble import RandomForestRegressor
 
 # Fetch training data and preprocess for modeling
 train_raw = pd.read_csv('Train.csv') 
@@ -24,11 +24,12 @@ Xs_train = train[['Pickup Lat','Pickup Long',
                  'Destination Lat','Destination Long']]
 
 # Fit model
-lasso = Lasso(alpha=0.01)
+model = RandomForestRegressor(n_estimators = 500)
 print ("Training Model...")
-lasso.fit(Xs_train, ys_train)
+model.fit(Xs_train, ys_train)
+
 
 # Pickle model for use within our API
-save_path = '../trained-models/RForrest_model.pkl'
+save_path = '../trained-models/Frankenstein.pkl'
 print (f"Training completed. Saving model to: {save_path}")
-pickle.dump(lasso, open(save_path,'wb'))
+pickle.dump(model, open(save_path,'wb'))
