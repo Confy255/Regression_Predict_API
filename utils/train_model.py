@@ -30,6 +30,6 @@ model.fit(Xs_train, ys_train)
 
 
 # Pickle model for use within our API
-save_path = '../trained-models/Frankenstein.pkl'
+save_path = '../trained-models/Frankenstein_lasso.pkl'
 print (f"Training completed. Saving model to: {save_path}")
 pickle.dump(model, open(save_path,'wb'))
