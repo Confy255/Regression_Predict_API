@@ -13,6 +13,8 @@
 import pandas as pd
 import pickle
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.linear_model import Lasso
+
 
 # Fetch training data and preprocess for modeling
 train_raw = pd.read_csv('Train.csv') 
