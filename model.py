@@ -26,6 +26,8 @@ import numpy as np
 import pandas as pd
 import pickle
 import json
+from sklearn.preprocessing import OneHotEncoder
+
 
 def _preprocess_data(data):
     """Private helper function to preprocess data for model prediction.
@@ -108,15 +110,15 @@ def _preprocess_data(data):
 
     # Convert the 'platform type' data type to category
     feature_vector_df['Platform Type'] = feature_vector_df['Platform Type'].astype('category')
-    feature_vector_df['Personal or Business'] = feature_vector_df['Personal or Business'].astype('category')
 
 
     # Encode categorical data
-    feature_vector_df['Personal or Business'] = feature_vector_df['Personal or Business'].cat.codes
+    ohe = OneHotEncoder()
+    ohe_results = ohe.fit_transform(feature_vector_df['Personal or Business'])
+    ohe_results_df = pd.DataFrame(ohe_results, columns=ohe.classes_)
+    feature_vector_df = pd.concat([feature_vector_df, ohe_results_df], axis=1)
 
     #feature_vector_df = pd.get_dummies(feature_vector_df, drop_first=True)
-
-
 
     predict_vector = feature_vector_df
 
