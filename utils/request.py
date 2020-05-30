@@ -25,9 +25,9 @@ import numpy as np
 # Load data from file to send as an API POST request.
 # We prepare a DataFrame with the public test set + riders data
 # from the Zindi challenge.
-test = pd.read_csv('data/test_data.csv')
-riders = pd.read_csv('data/riders.csv')
-test = test.merge(riders, how='left', on='Rider Id')
+train_raw = pd.read_csv('Train.csv') 
+riders_raw = pd.read_csv('Riders.csv')
+train = train_raw.merge(riders_raw, how="left", on = "Rider Id")
 
 # Convert our DataFrame to a JSON string.
 # This step is necessary in order to transmit our data via HTTP/S
@@ -51,6 +51,6 @@ api_response = requests.post(url, json=feature_vector_json)
 # Display the prediction result
 print("Received POST response:")
 print("*"*50)
-print(f"API prediction result: {api_response.json()[0]}")
+print(f"API prediction result: {api_response.json()}")
 print(f"The response took: {api_response.elapsed.total_seconds()} seconds")
 print("*"*50)
