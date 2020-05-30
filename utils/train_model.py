@@ -13,20 +13,19 @@
 import pandas as pd
 import pickle
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.linear_model import Lasso
 
 
 # Fetch training data and preprocess for modeling
-train_raw = pd.read_csv('Train.csv') 
-riders_raw = pd.read_csv('Riders.csv')
-train = train_raw.merge(riders_raw, how="left", on = "Rider Id")
+train_raw = pd.read_csv('data/Train.csv') 
+riders_raw = pd.read_csv('data/Riders.csv')
+train = train_raw.merge(riders_raw, how="left", on="Rider Id")
 
 ys_train = train[['Time from Pickup to Arrival']]
 Xs_train = train[['Pickup Lat','Pickup Long',
                  'Destination Lat','Destination Long']]
 
 # Fit model
-model = RandomForestRegressor(n_estimators = 500)
+model = RandomForestRegressor(n_estimators=500, random_state=101, max_depth=10, max_leaf_nodes=200)
 print ("Training Model...")
 model.fit(Xs_train, ys_train)
 
