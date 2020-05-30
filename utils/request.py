@@ -45,8 +45,11 @@ print(f"Sending POST request to web server API at: {url}")
 print("")
 print(f"Querying API with the following data: \n {test.iloc[1].to_list()}")
 print("")
+
+header = {'Content-Type': 'application/json', \
+                  'Accept': 'application/json'}
 # Here `api_response` represents the response we get from our API
-api_response = requests.post(url, json=feature_vector_json, headers= header)
+api_response = requests.post(url, json=feature_vector_json, headers=header)
 
 # Display the prediction result
 print("Received POST response:")
