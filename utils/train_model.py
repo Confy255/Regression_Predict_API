@@ -27,7 +27,7 @@ Xs_train = train[['Pickup Lat','Pickup Long',
 # Fit model
 model = RandomForestRegressor(n_estimators=500, random_state=101, max_depth=10, max_leaf_nodes=200)
 print ("Training Model...")
-model.fit(Xs_train, ys_train)      #.reshape(-1,1)#added .reshape on this line
+model.fit(Xs_train, ys_train).reshape(-1,1) #added .reshape on this line
 
 
 # Pickle model for use within our API
