@@ -108,9 +108,15 @@ def _preprocess_data(data):
 
     # Convert the 'platform type' data type to category
     feature_vector_df['Platform Type'] = feature_vector_df['Platform Type'].astype('category')
+    feature_vector_df['Personal or Business'] = feature_vector_df['Personal or Business'].astype('category')
+
 
     # Encode categorical data
-    feature_vector_df = pd.get_dummies(feature_vector_df, drop_first=True)
+    feature_vector_df['Personal or Business'] = feature_vector_df['Personal or Business'].cat.codes
+
+    #feature_vector_df = pd.get_dummies(feature_vector_df, drop_first=True)
+
+
 
     predict_vector = feature_vector_df
 
