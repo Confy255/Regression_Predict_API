@@ -31,6 +31,6 @@ model.fit(Xs_train, ys_train).reshape(-1,1)#added .reshape on this line
 
 
 # Pickle model for use within our API
-save_path = '../trained-models/Frankenstein_final_RF.pkl'
+save_path = '../trained-models/rfmodel.pkl'
 print (f"Training completed. Saving model to: {save_path}")
 pickle.dump(model, open(save_path,'wb'))
