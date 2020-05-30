@@ -112,8 +112,7 @@ def _preprocess_data(data):
     # Encode categorical data
     feature_vector_df = pd.get_dummies(feature_vector_df, drop_first=True)
 
-    predict_vector = feature_vector_df[['Pickup Lat','Pickup Long',
-                                        'Destination Lat','Destination Long']]
+    predict_vector = feature_vector_df
 
 
     return predict_vector
