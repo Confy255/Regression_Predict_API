@@ -26,7 +26,6 @@ import numpy as np
 import pandas as pd
 import pickle
 import json
-from sklearn.preprocessing import OneHotEncoder
 
 
 def _preprocess_data(data):
@@ -113,12 +112,8 @@ def _preprocess_data(data):
 
 
     # Encode categorical data
-    ohe = OneHotEncoder()
-    ohe_results = ohe.fit_transform(feature_vector_df['Personal or Business'])
-    ohe_results_df = pd.DataFrame(ohe_results, columns=ohe.classes_)
-    feature_vector_df = pd.concat([feature_vector_df, ohe_results_df], axis=1)
-
-    #feature_vector_df = pd.get_dummies(feature_vector_df, drop_first=True)
+    feature_vector_df.loc[feature_vector_df['Personal or Business'] == 'Personal', 'Personal or Business'] = 1
+    feature_vector_df.loc[feature_vector_df['Personal or Business'] == 'Business', 'Personal or Business'] = 0
 
     predict_vector = feature_vector_df
 
