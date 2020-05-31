@@ -114,7 +114,7 @@ def load_model(path_to_model:str):
         The pretrained model loaded into memory.
 
     """
-    return pickle.load(open(path_to_model, 'rb'))
+    return pickle.load(open(path_to_model='assets/trained-models/rfmodel_2.pkl', 'rb'))
 
 def make_prediction(data, model):
     """Prepare request data for model prediciton.
