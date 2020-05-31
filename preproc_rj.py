@@ -72,7 +72,8 @@ def _preprocess_data(data):
                'Arrival at Pickup - Weekday (Mo = 1)',
                'Arrival at Pickup - Time',
                'Pickup - Day of Month',
-               'Pickup - Weekday (Mo = 1)']
+               'Pickup - Weekday (Mo = 1)'
+               'Platform Type']
 
     # drop columns
     feature_vector_df.drop(to_drop, axis = 1, inplace = True)
@@ -106,11 +107,9 @@ def _preprocess_data(data):
     feature_vector_df['Precipitation in millimeters'].fillna(0,inplace=True)
     feature_vector_df['Temperature'].fillna(23.25,inplace=True)
 
-    # Convert the 'platform type' data type to category
-    feature_vector_df['Platform Type'] = feature_vector_df['Platform Type'].astype('category')
-
-    # Encode categorical data
-    feature_vector_df = pd.get_dummies(feature_vector_df, drop_first=True)
+    # Encode Personal or Business column
+    feature_vector_df.loc[feature_vector_df['Personal or Business'] == 'Personal', 'Personal or Business'] = 1
+    feature_vector_df.loc[feature_vector_df['Personal or Business'] == 'Business', 'Personal or Business'] = 0
 
     predict_vector = feature_vector_df
     # ------------------------------------------------------------------------
