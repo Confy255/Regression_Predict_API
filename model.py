@@ -76,7 +76,7 @@ def _preprocess_data(data):
                'Pickup - Weekday (Mo = 1)']
 
     # drop columns
-    #feature_vector_df.drop(to_drop, axis = 1, inplace = True)
+    feature_vector_df.drop(to_drop, axis = 1, inplace = True)
 
     # add features
     # add waiting time
