@@ -100,8 +100,8 @@ def _preprocess_data(data):
     feature_vector_df['hr_cos'] = np.cos(feature_vector_df['Pickup - Time']*(2.*np.pi/24))
 
     # drop unecessary columns
-    #drop = ['Placement - Time', 'Pickup - Time','Placement - Weekday (Mo = 1)', 'Placement - Day of Month']
-    #feature_vector_df.drop(drop, axis = 1, inplace = True)
+    drop = ['Placement - Time', 'Pickup - Time','Placement - Weekday (Mo = 1)', 'Placement - Day of Month']
+    feature_vector_df.drop(drop, axis = 1, inplace = True)
 
     # Impute missing values
     feature_vector_df['Precipitation in millimeters'].fillna(0,inplace=True)
