@@ -76,23 +76,43 @@ def _preprocess_data(data):
                'Pickup - Weekday (Mo = 1)']
 
     # drop columns
-    df = feature_vector_df.copy()
-    df.drop(to_drop, axis = 1, inplace = True)
+    feature_vector_df.drop(to_drop, axis = 1, inplace = True)
 
-    #encode categorical variables
-    df.loc[df['Personal or Business'] == 'Personal', 'Personal or Business'] = 1
-    df.loc[df['Personal or Business'] == 'Business', 'Personal or Business'] = 0
+    # add features
+    # add waiting time
+    feature_vector_df['Pickup - Time'] = pd.to_datetime(feature_vector_df['Pickup - Time'])
+    feature_vector_df['Placement - Time'] = pd.to_datetime(feature_vector_df['Placement - Time'])
+    feature_vector_df['Waiting time'] = feature_vector_df['Pickup - Time'] - feature_vector_df['Placement - Time']
+    feature_vector_df['Waiting time'] = feature_vector_df['Waiting time'].astype('timedelta64[s]')
 
-    # converting object data types for Pickup Times to date_time
-    df['Pickup - Time'] = pd.to_datetime(df['Pickup - Time'])
-    df['Pickup - Time'] = df['Pickup - Time'].apply(lambda time: time.hour)
+        # convert day of month to cyclic feature
+    feature_vector_df['month_sin'] = np.sin((feature_vector_df['Placement - Day of Month']-1)*(2.*np.pi/30.5))
+    feature_vector_df['month_cos'] = np.cos((feature_vector_df['Placement - Day of Month']-1)*(2.*np.pi/30.5))
 
-    # fill precipitation null values with 0
-    df['Precipitation in millimeters'].fillna(0,inplace=True)
+    # Converting the weekday to a cyclic feature
+    feature_vector_df['day_sin'] = np.sin((feature_vector_df['Placement - Weekday (Mo = 1)']-1)*(2.*np.pi/7))
+    feature_vector_df['day_cos'] = np.cos((feature_vector_df['Placement - Weekday (Mo = 1)']-1)*(2.*np.pi/7))
 
-    # impute temperature values by mean
-    df.Temperature.fillna(23.25,inplace=True)
-    predict_vector = df
+    # Converting the pickup time to date_time format and extracting the hour
+    feature_vector_df['Pickup - Time'] = pd.to_datetime(feature_vector_df['Pickup - Time']).dt.hour
+
+    # convert pickup time to cyclic feature
+    feature_vector_df['hr_sin'] = np.sin(feature_vector_df['Pickup - Time']*(2.*np.pi/24))
+    feature_vector_df['hr_cos'] = np.cos(feature_vector_df['Pickup - Time']*(2.*np.pi/24))
+
+    # drop unecessary columns
+    drop = ['Placement - Time', 'Pickup - Time','Placement - Weekday (Mo = 1)', 'Placement - Day of Month']
+    feature_vector_df.drop(drop, axis = 1, inplace = True)
+
+    # Impute missing values
+    feature_vector_df['Precipitation in millimeters'].fillna(0,inplace=True)
+    feature_vector_df['Temperature'].fillna(23.25,inplace=True)
+
+    # Encode Personal or Business column
+    feature_vector_df.loc[feature_vector_df['Personal or Business'] == 'Personal', 'Personal or Business'] = 1
+    feature_vector_df.loc[feature_vector_df['Personal or Business'] == 'Business', 'Personal or Business'] = 0
+
+    predict_vector = feature_vector_df
 
 
     return predict_vector
